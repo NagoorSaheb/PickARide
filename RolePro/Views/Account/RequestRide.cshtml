@@ -1,0 +1,97 @@
+﻿
+@model RolePro.Models.ViewModel.UserRequestRideView
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery-ui-1.11.4.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+
+@{
+    ViewBag.Title = "RequestRide";
+
+}
+
+
+<a href="javacript:void(0)" class="lnkRequest">Request a Ride</a>
+
+<div id="divRequest" style="display:none">
+    <input type="hidden" id=hidID value=@Context.User.Identity.Name />
+    <table>
+        <tr>
+            <td>Additional Contact:</td>
+            <td><input type="text" id="txtcontact" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td>No of Persons:</td>
+            <td><input type="text" id="txtPersons" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td>Comments:</td>
+            <td><input type="text" id="txtComments" class="form-control" /></td>
+        </tr>
+       
+       </table>
+</div>  
+
+
+
+@ViewBag.Message
+
+<script type="text/javascript">
+
+    $(function () {
+
+        var initDialog = function (type) {
+            var title = type;
+            $("#divRequest").dialog({
+                autoOpen: false,
+                modal: true,
+                title: type + ' User',
+                width: 360,
+                buttons: {
+                    Save: function () {
+                        var id = $("#hidID").val();
+                        var phone = $("#txtcontact").val();
+                        var persons = $("#txtPersons").val();
+                        var comments = $("#txtComments").val();
+                      
+                        alert("id to pass " + id);
+
+                        SubmitRequest(id, phone, persons, comments);
+                        $(this).dialog("destroy");
+                    },
+                    Cancel: function () { $(this).dialog("destroy"); }
+                }
+            });
+        }
+
+        function SubmitRequest(id, phone, persons, comments) {
+            $.ajax({
+                type: "POST",
+                url: "@(Url.Action("SubmitRequest","Account"))",
+                data: { userID: id, phone: phone, persons: persons, comments: comments},
+                success: function (data) {
+                  //  $("#divUserListContainer").load("@(Url.Action("Welcome","Home", new { status ="update" }))");
+                    Response.Redirect(Request.RawUrl);
+                },
+                error: function (error) {
+                    //to do:
+                }
+            });
+        }
+
+        $("a.lnkRequest").on("click", function () {
+            initDialog("Request");
+            $(".alert-success").empty();
+          
+
+            $("#divRequest").dialog("open");
+            return false;
+        });
+
+
+
+    });
+
+
+
+</script>
